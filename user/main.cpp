@@ -105,7 +105,62 @@ void copyf4(float f3[4], float f3_2[4])
 	f3[3] = f3_2[3];
 
 }
+template <class T>
+class pComponent {
+	private:
+	std::string getClassName()
+	{
+		std::string class_name = typeid(T).name();
+		reuturn class_name.substr(12);
+	}
+	public:
 
+	T* m_pComponent;
+	std::string m_pName;
+	pComponent()
+	{
+		this->m_pName = this->getClassName();
+	}
+
+	void init(GameObject* object)
+	{
+		GameObject_GetComponentByName(object, this->m_pName, nullptr);
+	}
+
+
+}
+
+class pGameObject
+{
+	GameObject* m_pGameObject;
+	Transform* m_pTransform;
+	std::string m_pName;
+
+	pGameObject(std::string name)
+	{
+		this->m_pName = name;	
+	}
+
+	void init()
+	{
+
+	}
+
+}
+
+class pPlayer {
+
+	pPlayer() : pGameObject("Player"), pComponent<FPSControllerNEW*>();
+	{
+		std::cout << " Player Constructor called " << std::endl;
+	}
+
+	void create()
+	{
+		this->m_pGameObject.init();
+		this->m_pComponent.init();	
+	}
+}
 class Granny
 {
 public:
