@@ -107,274 +107,67 @@ void copyf4(float f3[4], float f3_2[4])
 }
 template <class T>
 class pComponent {
-	private:
+private:
 	std::string getClassName()
 	{
 		std::string class_name = typeid(T).name();
 		reuturn class_name.substr(12);
 	}
-	public:
+public:
 
 	T* m_pComponent;
-	std::string m_pName;
+	std::string m_pClassName;
 	pComponent()
 	{
-		this->m_pName = this->getClassName();
+		this->m_pClassName = this->getClassName();
 	}
 
-	void init(GameObject* object)
+	void init_component(GameObject* object)
 	{
-		GameObject_GetComponentByName(object, this->m_pName, nullptr);
+		GameObject_GetComponentByName(object, this->m_pClassName, nullptr);
 	}
 
 
-}
+};
 
 class pGameObject
 {
+public:
+
 	GameObject* m_pGameObject;
 	Transform* m_pTransform;
 	std::string m_pName;
 
 	pGameObject(std::string name)
 	{
-		this->m_pName = name;	
+		this->m_pName = name;
 	}
 
-	void init()
+	void init_object()
 	{
-
+		this->m_pGameObject = GameObject_Find(fixstr(this->m_pName.c_str()), nullptr);
 	}
 
-}
+};
 
-class pPlayer {
-
-	pPlayer() : pGameObject("Player"), pComponent<FPSControllerNEW*>();
+class pPlayer : public pGameObject, public pComponent<FPSControllerNEW*> {
+	using pGameObject::pGameObject;
+	using pComponent::pComponent;
+	pPlayer() : pGameObject("Player"), pComponent()
 	{
 		std::cout << " Player Constructor called " << std::endl;
 	}
 
 	void create()
 	{
-		this->m_pGameObject.init();
-		this->m_pComponent.init();	
+		this->init_object();
+		this->init_component(this->m_pGameObject);
 	}
-}
-class Granny
-{
-public:
-	GameObject* pObject;
-	Transform* pTransform;
-	EnemyAIGranny* pGranny;
-
-	float userPos[3];
-	float userScale[3];
-	float userRot[3];
-	bool isSpinMod;
-	Granny()
-	{
-
-	}
-
-	void init()
-	{
-		this->pObject = GameObject_Find(fixstr("GrannyParent"), nullptr);
-		this->pTransform = GameObject_get_transform(this->pObject, nullptr);
-		this->pGranny = reinterpret_cast<EnemyAIGranny*>(GameObject_GetComponentByName(this->pObject, fixstr("EnemyAIGranny"), nullptr));
-	}
-
-	Vector3 Position()
-	{
-		return Transform_get_position(this->pTransform, nullptr);
-	}
-
-	Vector3 Rotation()
-	{
-		return Transform_get_eulerAngles(this->pTransform, nullptr);
-	}
-
-	Vector3 localScale()
-	{
-		return Transform_get_localScale(this->pTransform, nullptr);
-	}
-
-	float* fPosition()
-	{
-		float pos[3];
-		pos[0] = Position().x;
-		pos[1] = Position().y;
-		pos[2] = Position().z;
-		return pos;
-	}
-
-	float* fScale()
-	{
-		float pos[3];
-		pos[0] = localScale().x;
-		pos[1] = localScale().y;
-		pos[2] = localScale().z;
-		return pos;
-	}
-
-
-	float* fRotation()
-	{
-		float rot[3];
-		rot[0] = Rotation().x;
-		rot[1] = Rotation().y;
-		rot[2] = Rotation().z;
-		
-
-		return rot;
-
-	}
-
-	void setPosition(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_position(this->pTransform, realpos, nullptr);
-	}
-
-	void setScale(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_localScale(this->pTransform, realpos, nullptr);
-	}
-
-
-	void setRotation(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_eulerAngles(this->pTransform, realpos, nullptr);
-	}
-
-};
-
-class Player
-{
-public:
-	GameObject* pObject;
-	Transform* pTransform;
-	FPSControllerNEW* pPlayer;
-	Camera* cam;
-	float userPos[3];
-	float userScale[3];
-	float userRot[3];
-	float userFov = 60;
-	bool isSpinMod;
-	Player()
-	{
-
-	}
-
-	void init()
-	{
-		this->pObject = GameObject_Find(fixstr("Player"), nullptr);
-		this->pTransform = GameObject_get_transform(this->pObject, nullptr);
-		this->pPlayer = reinterpret_cast<FPSControllerNEW*>(GameObject_GetComponentByName(this->pObject, fixstr("FPSControllerNEW"), nullptr));
-		//this->cam = reinterpret_cast<Camera*>(GameObject_GetComponentByName(this->pPlayer->fields.mainCam, fixstr("Camera"), nullptr));
-		
-
-	}
-
-	Vector3 Position()
-	{
-		return Transform_get_position(this->pTransform, nullptr);
-	}
-
-	Vector3 Rotation()
-	{
-		return Transform_get_eulerAngles(this->pTransform, nullptr);
-	}
-
-	Vector3 localScale()
-	{
-		return Transform_get_localScale(this->pTransform, nullptr);
-	}
-
-	float* fPosition()
-	{
-		float pos[3];
-		pos[0] = Position().x;
-		pos[1] = Position().y;
-		pos[2] = Position().z;
-		return pos;
-	}
-
-	float* fScale()
-	{
-		float pos[3];
-		pos[0] = localScale().x;
-		pos[1] = localScale().y;
-		pos[2] = localScale().z;
-		return pos;
-	}
-
-
-	float* fRotation()
-	{
-		float rot[3];
-		rot[0] = Rotation().x;
-		rot[1] = Rotation().y;
-		rot[2] = Rotation().z;
-
-
-		return rot;
-
-	}
-
-	void setPosition(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_position(this->pTransform, realpos, nullptr);
-	}
-
-	void setScale(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_localScale(this->pTransform, realpos, nullptr);
-	}
-
-
-	void setRotation(float position[3])
-	{
-		Vector3 realpos;
-		realpos.x = position[0];
-		realpos.y = position[1];
-		realpos.z = position[2];
-		Transform_set_eulerAngles(this->pTransform, realpos, nullptr);
-	}
-
 };
 
 namespace globals {
-	Player player;
-	Granny granny;
-	bool isEsp;
-	bool isSceneLoaded;
-	GuiState state = GuiState::INTRO;
-	bool hasCloned;
-	std::vector<GameObject*> cloned_granny;
-	
+	bool isSceneLoaded = false;
 }
-
-
 void waitForSceneLoad()
 {
 	while (globals::isSceneLoaded != true)
@@ -433,113 +226,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui::NewFrame();
 
 	ImGui::Begin("ImGui Window");
-	ImGui::Text("Granny 3 PC Mod menu by mogus#2891");
-	if (globals::state == GuiState::INTRO)
-	{
-		if (globals::isSceneLoaded == false)
-		{
-			ImGui::Text("Waiting for scene to load");
-		}
-		else {
-			ImGui::Text("Scene Loaded , ready to start !");
-			if (ImGui::Button("Start"))
-			{
-				globals::state = GuiState::HOME;
-				globals::granny.init();
-				globals::player.init();
-				
-			}
-		}
-		
-	}
-	else if (globals::state == GuiState::HOME)
-	{
-		if (globals::isSceneLoaded)
-		{
-			
-			copyf3(globals::granny.userPos, globals::granny.fPosition());
-			copyf3(globals::granny.userScale, globals::granny.fScale());
-			copyf3(globals::granny.userRot, globals::granny.fRotation());
-			if (globals::granny.isSpinMod)
-			{
-				float newrot[3];
-				newrot[0] = globals::granny.fRotation()[0] + 0;
-				newrot[1] = globals::granny.fRotation()[1] + 100;
-				
-				newrot[2] = globals::granny.fRotation()[2] + 0;
-				
-				globals::granny.setRotation(newrot);
-				
-			}
-
-			if (ImGui::BeginTabBar("Modifications"))
-			{
-				if (ImGui::BeginTabItem("Player"))
-				{
-					ImGui::BeginGroupPanel("Movement");
-					ImGui::SliderFloat("Walkspeed ", &globals::player.pPlayer->fields.forwardSpeed, 0, 100, "%.1f");
-					
-					ImGui::EndGroupPanel();
-					ImGui::BeginGroupPanel("Behaviour");
-					if (ImGui::SliderFloat("Field Of View ", &globals::player.userFov, 0, 200, "%f"))
-					{
-						//Camera_set_fieldOfView(globals::player.cam, globals::player.userFov, nullptr);
-					}
-
-					
-					ImGui::EndGroupPanel();
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Granny"))
-				{
-					ImGui::BeginGroupPanel("Movement");
-					ImGui::SliderFloat("Granny Walkspeed", &globals::granny.pGranny->fields.walkSpeed, 0, 100, "%.1f");
-					ImGui::SliderFloat("Granny Follow Speed", &globals::granny.pGranny->fields.grannysFollowSpeed, 0, 100, "%.1f");
-					ImGui::SliderFloat("Granny WalkAnim Speed", &globals::granny.pGranny->fields.walkAnimSpeed, 0, 100, "%.1f");
-					ImGui::SliderFloat("Granny WalkAnim Follow Speed", &globals::granny.pGranny->fields.grannysAnimFollowSpeed, 0, 100, "%.1f");
-					ImGui::EndGroupPanel();
-					ImGui::BeginGroupPanel("Behaviour");
-					if (ImGui::Button("Kill Granny (GUN)"))
-					{
-						//globals::granny.pGranny->fields.hitByGun = true;
-						EnemyAIGranny_grannyHitByGun(globals::granny.pGranny, nullptr);
-					}
-					if (ImGui::Button("Stun Granny"))
-					{
-						
-						globals::granny.pGranny->fields.getStunned = true;
-					}
-					ImGui::EndGroupPanel();
-					ImGui::BeginGroupPanel("Transforms");
-					if (ImGui::SliderFloat3("Position", globals::granny.userPos, -30, 30, "%.1f"))
-					{
-						globals::granny.setPosition(globals::granny.userPos);
-					}
-					if (ImGui::SliderFloat3("Scale", globals::granny.userScale, -10, 10, "%.1f"))
-					{
-						globals::granny.setScale(globals::granny.userScale);
-					}
-					if (ImGui::SliderFloat3("Rotation", globals::granny.userRot, -360, 360, "%.1f"))
-					{
-						globals::granny.setRotation(globals::granny.userRot);
-					}
-					ImGui::EndGroupPanel();
-
-					ImGui::BeginGroupPanel("Visuals");
-					ImGui::Checkbox("Tracers", &globals::isEsp);
-					ImGui::EndGroupPanel();
-
-					ImGui::BeginGroupPanel("Fun");
-					ImGui::Checkbox("Spin", &globals::granny.isSpinMod);
-					ImGui::EndGroupPanel();
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
-		}
-		
-
-	}
+	
 	ImGui::End();
 
 	ImGui::Render();
