@@ -34,6 +34,8 @@ void il2cppi_log_write(std::string text) {
 void il2cppi_new_console() {
     AllocConsole();
     freopen_s((FILE**) stdout, "CONOUT$", "w", stdout);
+    freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
+
 }
 
 #if _MSC_VER >= 1920

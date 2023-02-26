@@ -14,21 +14,6 @@ using namespace app;
 // Set the name of your log file here
 extern const LPCWSTR LOG_FILE = L"il2cpp-log.txt";
 
-/*// Custom injected code entry point
-void Run()
-{
-    // Initialize thread data - DO NOT REMOVE
-    il2cpp_thread_attach(il2cpp_domain_get());
-
-    // If you would like to write to a log file, specify the name above and use il2cppi_log_write()
-    // il2cppi_log_write("Startup");
-
-    // If you would like to output to a new console window, use il2cppi_new_console() to open one and redirect stdout
-    // il2cppi_new_console();
-
-    // Place your custom code here
-}*/
-
 #include "pch-il2cpp.h"
 #pragma once
 #include <Windows.h>
@@ -41,6 +26,7 @@ void Run()
 #include <thread>
 #include <vector>
 #include "../kiero/minhook/include/MinHook.h"
+#include "../objects.h"
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
@@ -85,10 +71,6 @@ std::string getClassName()
 }
 
 
-enum GuiState {
-	INTRO,
-	HOME
-};
 
 void copyf3(float f3[3], float f3_2[3])
 {
@@ -105,68 +87,17 @@ void copyf4(float f3[4], float f3_2[4])
 	f3[3] = f3_2[3];
 
 }
-template <class T>
-class pComponent {
-private:
-	std::string getClassName()
-	{
-		std::string class_name = typeid(T).name();
-		reuturn class_name.substr(12);
-	}
-public:
 
-	T* m_pComponent;
-	std::string m_pClassName;
-	pComponent()
-	{
-		this->m_pClassName = this->getClassName();
-	}
-
-	void init_component(GameObject* object)
-	{
-		GameObject_GetComponentByName(object, this->m_pClassName, nullptr);
-	}
-
-
+enum gui_state {
+	INTRO,
+	HOME,
+	CREDIT
 };
-
-class pGameObject
-{
-public:
-
-	GameObject* m_pGameObject;
-	Transform* m_pTransform;
-	std::string m_pName;
-
-	pGameObject(std::string name)
-	{
-		this->m_pName = name;
-	}
-
-	void init_object()
-	{
-		this->m_pGameObject = GameObject_Find(fixstr(this->m_pName.c_str()), nullptr);
-	}
-
-};
-
-class pPlayer : public pGameObject, public pComponent<FPSControllerNEW*> {
-	using pGameObject::pGameObject;
-	using pComponent::pComponent;
-	pPlayer() : pGameObject("Player"), pComponent()
-	{
-		std::cout << " Player Constructor called " << std::endl;
-	}
-
-	void create()
-	{
-		this->init_object();
-		this->init_component(this->m_pGameObject);
-	}
-};
-
 namespace globals {
 	bool isSceneLoaded = false;
+	gui_state imState = gui_state::INTRO;
+	pPlayer player;
+	
 }
 void waitForSceneLoad()
 {
@@ -225,7 +156,24 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("ImGui Window");
+	ImGui::Begin("Granny 3 Mod Menu by mogus#2891");
+	if (globals::imState == gui_state::INTRO)
+	{
+		ImGui::Text("Waiting for Game To Start...");
+		if (globals::isSceneLoaded == true)
+		{
+			ImGui::Text("Game Started !!! , click to start using the mod menu");
+			if (ImGui::Button("Start"))
+			{
+				globals::imState = gui_state::HOME;
+				globals::player.create();
+				globals::player.m_pComponent->fields.forwardSpeed = 20;
+			}
+		}
+	}
+	else if (globals::imState == gui_state::HOME) {
+		
+	}
 	
 	ImGui::End();
 
@@ -264,6 +212,15 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
+
+
+
+
+
+
+
+
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../imgui/imgui_internal.h"

@@ -52,6 +52,9 @@
     <ClCompile Include="imgui\imgui_demo.cpp">
       <Filter>user</Filter>
     </ClCompile>
+    <ClCompile Include="objects.cpp">
+      <Filter>user\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="user\main.h">
@@ -139,6 +142,9 @@
     <ClInclude Include="imgui\imgui_impl_win32.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="objects.h">
+      <Filter>user\objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="appdata">
@@ -155,6 +161,9 @@
     </Filter>
     <Filter Include="imgui">
       <UniqueIdentifier>{9bd37658-ea11-4bdb-a94b-18539e0ceff4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="user\objects">
+      <UniqueIdentifier>{b083306d-32ce-4070-ae2b-aaa44f273bd1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
