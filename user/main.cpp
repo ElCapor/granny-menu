@@ -26,7 +26,7 @@ extern const LPCWSTR LOG_FILE = L"il2cpp-log.txt";
 #include <thread>
 #include <vector>
 #include "../kiero/minhook/include/MinHook.h"
-#include "../objects.h"
+
 typedef HRESULT(__stdcall* Present) (IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef uintptr_t PTR;
@@ -61,61 +61,7 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 bool init = false;
-#define fixstr(text) reinterpret_cast<String*>(il2cpp_string_new(text))
-template <typename T>
-std::string getClassName()
-{
-	std::string rtti_name = typeid(T).name();
-	std::string class_name = rtti_name.substr(12); // remove "struct app::"
-	return class_name;
-}
 
-
-
-void copyf3(float f3[3], float f3_2[3])
-{
-	f3[0] = f3_2[0];
-	f3[1] = f3_2[1];
-	f3[2] = f3_2[2];
-}
-
-void copyf4(float f3[4], float f3_2[4])
-{
-	f3[0] = f3_2[0];
-	f3[1] = f3_2[1];
-	f3[2] = f3_2[2];
-	f3[3] = f3_2[3];
-
-}
-
-enum gui_state {
-	INTRO,
-	HOME,
-	CREDIT
-};
-namespace globals {
-	bool isSceneLoaded = false;
-	gui_state imState = gui_state::INTRO;
-	pPlayer player;
-	
-}
-void waitForSceneLoad()
-{
-	while (globals::isSceneLoaded != true)
-	{
-		Scene current = SceneManager_GetActiveScene(nullptr);
-		std::string scene_name = il2cppi_to_string(Scene_GetNameInternal(current.m_Handle, nullptr));
-
-		if (scene_name == "Scene")
-		{
-			std::cout << "loaded" << std::endl;
-			Sleep(10000); //
-			globals::isSceneLoaded = true;
-			
-		}
-		Sleep(1000);
-	}
-}
 
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -139,12 +85,6 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 			il2cpp_thread_attach(il2cpp_domain_get()); // initialize
 			il2cppi_new_console();
 			std::cout << ">> Started <<" << std::endl;
-			std::cout << getClassName<EnemyAIGranny>() << std::endl;
-			std::cout << getClassName<FPSControllerNEW>() << std::endl;
-			std::cout << getClassName<Transform>() << std::endl;
-			std::cout << getClassName<SceneManager>() << std::endl;
-			std::cout << getClassName<HandObjectFalls>() << std::endl;
-			std::thread(waitForSceneLoad).detach();
 			
 		}
 
@@ -156,24 +96,8 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("Granny 3 Mod Menu by mogus#2891");
-	if (globals::imState == gui_state::INTRO)
-	{
-		ImGui::Text("Waiting for Game To Start...");
-		if (globals::isSceneLoaded == true)
-		{
-			ImGui::Text("Game Started !!! , click to start using the mod menu");
-			if (ImGui::Button("Start"))
-			{
-				globals::imState = gui_state::HOME;
-				globals::player.create();
-				globals::player.m_pComponent->fields.forwardSpeed = 20;
-			}
-		}
-	}
-	else if (globals::imState == gui_state::HOME) {
-		
-	}
+	ImGui::Begin("Granny 3 Mod Menu");
+	
 	
 	ImGui::End();
 
